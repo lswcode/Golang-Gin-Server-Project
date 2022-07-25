@@ -8,13 +8,17 @@ import (
 
 	"gin_server/utils"
 
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
 
 func TestController(c *gin.Context) { // gin把request和response都封装到了gin.Context中
-	c.String(200, "请求成功")
-	xiaobai := models.User{Username: "小白", Password: "123456"}
-	db.Db.Create(&xiaobai)
+	session := sessions.Default(c)
+	if value := session.Get("account"); value == nil {
+		c.String(200, "获取session失败")
+	} else {
+		c.String(200, value.(string))
+	}
 }
 
 func LoginController(c *gin.Context) {
@@ -37,6 +41,24 @@ func LoginController(c *gin.Context) {
 	if afterMD5 := utils.Md5(loginJson.Password); afterMD5 != userDb.Password {
 		c.JSON(http.StatusOK, gin.H{"code": "202", "msg": "密码不正确，请重新输入"})
 	} else {
+		// cookie, err := c.Cookie("key_cookie") // 先判断当前请求是否已经携带cookie
+		// if err != nil {
+		// 	cookie = "NotSet"
+		// 	c.SetCookie("gin_cookie", "test1", 3600, "/", // 参数依次为 cookie的键，值，有效期，cookie所在目录，cookie作用域(本地调试时设置为localhost，生成环境设置为网站域名)，是否只支持https(true表示只能是https)，是否允许被JS操作
+		// 		"localhost", false, true)
+		// 	// c.SetCookie设置cookie后，当浏览器获取到这个请求响应后，会自动添加这里设置的cookie
+
+		// }
+		// fmt.Printf("cookie的值是： %s\n", cookie)
+
+		// ---一般都是要配合session使用，使用第三方库session来设置cookie和session，就不需要上面单独设置cookie的代码了----------------------------------------------------------------------
+		session := sessions.Default(c) // 默认格式，创建session时必须写
+		session.Set("account", userDb.Account)
+		err := session.Save() // 保存session
+		if err != nil {
+			fmt.Println("设置session报错", err)
+		}
+
 		c.JSON(http.StatusOK, gin.H{"code": "200", "msg": "登录成功"})
 	}
 }
