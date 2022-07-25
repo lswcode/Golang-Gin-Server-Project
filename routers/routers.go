@@ -11,8 +11,16 @@ func RouterInit() *gin.Engine {
 	gin.SetMode(gin.DebugMode) // 设置打包和运行模式，生产模式: gin.SetMode(gin.DebugMode)
 
 	// -----------------------------------------
-	router.GET("/", controllers.LoginController) // 在全局中间件被注册之前的路由请求不会触发全局中间件
+
+	router.GET("/", controllers.TestController) // 在全局中间件被注册之前的路由请求不会触发全局中间件
+
+	userAuth := router.Group("/userAuth") // 路由组
+	{
+		userAuth.POST("/login", controllers.LoginController)
+		userAuth.POST("/register", controllers.RegisterController)
+	}
 
 	// --------------------------------------------------
+
 	return router // 返回配置完成的路由
 }
