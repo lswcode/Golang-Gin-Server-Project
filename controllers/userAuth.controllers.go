@@ -14,7 +14,7 @@ import (
 
 func TestController(c *gin.Context) { // gin把request和response都封装到了gin.Context中
 	session := sessions.Default(c)
-	if value := session.Get("account"); value == nil {
+	if value := session.Get("sessionid"); value == nil {
 		c.String(200, "获取session失败")
 	} else {
 		c.String(200, value.(string))
@@ -52,9 +52,9 @@ func LoginController(c *gin.Context) {
 		// fmt.Printf("cookie的值是： %s\n", cookie)
 
 		// ---一般都是要配合session使用，使用第三方库session来设置cookie和session，就不需要上面单独设置cookie的代码了----------------------------------------------------------------------
-		session := sessions.Default(c) // 默认格式，创建session时必须写
-		session.Set("account", userDb.Account)
-		err := session.Save() // 保存session
+		session := sessions.Default(c)           // 默认格式，创建session时必须写
+		session.Set("sessionid", userDb.Account) // 将account作为sessionID保存到浏览器的cookie中，之后就可以根据cookie解析出用户账号了(也可以专门创建一个表，使用uuid等独一无二的ID作为sessionID，然后再将sessionID和登陆成功的用户数据一起保存到数据库中，之后就可以根据这个sessionID获取用户信息了)
+		err := session.Save()                    // 保存session
 		if err != nil {
 			fmt.Println("设置session报错", err)
 		}
