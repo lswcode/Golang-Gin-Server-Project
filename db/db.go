@@ -14,7 +14,7 @@ var Db *gorm.DB
 func init() {
 	// 第一个参数是连接的数据库类型，第二个参数依次是用户名，密码，数据库名，后面的使用默认的即可
 	// 返回两个参数，第二个参数就是连接失败时返回的错误
-	database, err := gorm.Open("mysql", "root:Lswmysql123.@/gin_server?charset=utf8&parseTime=True&loc=Local")
+	database, err := gorm.Open("mysql", "root:4b924d7dff38aec6@/gin_server?charset=utf8&parseTime=True&loc=Local")
 	if err != nil {
 		fmt.Println("gorm数据库连接失败")
 		panic(err) // 发送错误时报错并终止程序
