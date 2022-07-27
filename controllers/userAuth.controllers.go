@@ -12,8 +12,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type UserLogin struct {
+	Account  string `json:"account"`
+	Password string `json:"password"`
+}
+
 func LoginController(c *gin.Context) {
-	var loginJson models.User
+	var loginJson UserLogin
 	err := c.ShouldBindJSON(&loginJson) // 将request的body中的数据，自动按照json格式解析到结构体
 	fmt.Println("loginJson---------------------------------------------------", loginJson)
 	if err != nil {
@@ -21,7 +26,7 @@ func LoginController(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	var userInfo models.User
+	var userInfo models.User // 这个用来保存数据库查询到的用户数据
 	count := 0
 	db.Db.Where("account = ?", loginJson.Account).Find(&userInfo).Count(&count) // 查询指定的字段，会将查询到的结果保存在&userInfo中
 	if count == 0 {
@@ -82,7 +87,7 @@ func RegisterController(c *gin.Context) {
 	fmt.Println("加密后的密码", afterMD5)
 	registerJson.Password = afterMD5
 
-	err = db.Db.Create(&registerJson).Error
+	err = db.Db.Create(&registerJson).Error //
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
